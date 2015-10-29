@@ -1,19 +1,28 @@
  package main
 
 import (
-    //"fmt"
+    "fmt"
     "net/url"
     "log"
     "io/ioutil"
     "github.com/atsaki/golang-cloudstack-library"
     "os"
-)
-
-const (
-    WORKER_NAME = "wpau-worker"
+    "strings"
 )
 
 func main() {
+    if (len(os.Args) < 4) {
+        fmt.Printf("Usage: %s docker-repository image-name customer\n", os.Args[0])
+        os.Exit(1)
+    }
+
+    var (
+        repo string = os.Args[1]
+        worker_name string = os.Args[2]
+        customer string = os.Args[3]
+    )
+
+
     endpoint, _ := url.Parse("https://api.rbcloud.net/client/api")
     apikey := os.Getenv("RBC_API_KEY")
     secretkey := os.Getenv("RBC_SECRET")
@@ -25,16 +34,12 @@ func main() {
         panic(err)
     }
 
-    startJob(client)
-
-    //var (
-    //    customer = os.Args[1]
-    //)
+    startJob(customer, repo, worker_name, client)
 }
 
-func startJob(client* cloudstack.Client) {
+func startJob(customer string, repo string, worker_name string, client* cloudstack.Client) {
     log.Println("Starting job..")
-    userdata, _ := getUserdata()
+    userdata, _ := generateUserdata(repo, worker_name, customer)
     serviceOfferingMicro := "1bd74b58-ac1e-46e4-86cb-a9542064b8a4"
     defaultZone := "806945e8-2431-4526-9d1c-70748f287439"
     //networkId := "19313259-68af-4d65-9e28-1249ee60887a"
@@ -47,7 +52,7 @@ func startJob(client* cloudstack.Client) {
     params := cloudstack.NewDeployVirtualMachineParameter(serviceOfferingMicro, ubuntuTemplate, defaultZone)
     params.KeyPair.Set("ubuntu")
     params.UserData.Set(userdata)
-    params.Group.Set("wpau-worker")
+    params.Group.Set(worker_name)
 
     _, err := client.DeployVirtualMachine(params)
     if (err != nil) {
@@ -55,11 +60,23 @@ func startJob(client* cloudstack.Client) {
     }
 }
 
-func getUserdata() (string, error) {
+func getUserdataTemplate() (string, error) {
     dat, err := ioutil.ReadFile("./cloud-config.txt")
     if err == nil {
         return string(dat), nil
     } else {
         return "", err
     }
+}
+
+func generateUserdata(repo string, worker_name string, customer string) (string, error) {
+    content, err := getUserdataTemplate()
+    if (err != nil) {
+        return "", err
+    } else {
+        content = strings.Replace(content, "__DOCKER_REPO__", repo, -1)
+        content = strings.Replace(content, "__WORKER_NAME__", worker_name, -1)
+        content = strings.Replace(content, "__CUSTOMER__", customer, -1)
+    }
+    return content, nil
 }
