@@ -61,7 +61,7 @@ func startJob(customer string, repo string, worker_name string, client* cloudsta
 }
 
 func getUserdataTemplate() (string, error) {
-    dat, err := ioutil.ReadFile("./cloud-config.txt")
+    dat, err := ioutil.ReadFile("./cloud-config-template.txt")
     if err == nil {
         return string(dat), nil
     } else {
