@@ -10,6 +10,7 @@ import (
     "path/filepath"
     "bytes"
     "encoding/json"
+    //"strings"
 )
 
 func main() {
@@ -136,7 +137,10 @@ func uploadContentsInFolder(path string, prefix string, container string, c swif
 }
 
 func createContainer(name string, c swift.Connection) {
-    c.ContainerCreate(name, nil)
+    headers := map[string]string{
+        "X-Container-Read": ".r:*",
+    }
+    c.ContainerCreate(name, headers)
 }
 
 func uploadFile(container string, prefix string, path string, c swift.Connection) {
