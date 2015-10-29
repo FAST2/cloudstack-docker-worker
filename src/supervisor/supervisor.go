@@ -1,4 +1,4 @@
- package fast2.se
+ package main
 
 import (
     //"fmt"
