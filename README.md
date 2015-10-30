@@ -1,4 +1,4 @@
-# Wordpress automatic updates
+# Docker task runner for cloudstack
 
 # Settings
 export SWIFT_API_USER="username"
