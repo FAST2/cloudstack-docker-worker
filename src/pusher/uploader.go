@@ -128,7 +128,11 @@ func uploadContentsInFolder(path string, prefix string, container string, c swif
     createContainer(container, c)
 
     err := filepath.Walk(path, func(path string, f os.FileInfo, err error) error {
-        uploadFile(container, prefix, path, c)
+        if (f.IsDir()) {
+            uploadContentsInFolder(path, prefix, container, c)
+        } else {
+            uploadFile(container, prefix, path, c)
+        }
         return nil
     })
     if (err != nil) {
