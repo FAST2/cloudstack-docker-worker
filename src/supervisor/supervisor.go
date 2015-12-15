@@ -8,6 +8,9 @@ import (
     "github.com/atsaki/golang-cloudstack-library"
     "os"
     "strings"
+    "net/http"
+    "bytes"
+    "strconv"
 )
 
 func main() {
@@ -59,9 +62,12 @@ func startJob(customer string, repo string, worker_name string, client* cloudsta
     params.UserData.Set(userdata)
     params.Group.Set(worker_name)
 
-    _, err := client.DeployVirtualMachine(params)
+    _, err = client.DeployVirtualMachine(params)
     if (err != nil) {
         log.Printf("Couldn't create/deploy new instance, error from API: %s", err.Error())
+    } else {
+        sendStatus("Created new instance in da cloud for customer " + customer)
+        
     }
 }
 
@@ -88,3 +94,18 @@ func generateUserdata(repo string, worker_name string, customer string) (string,
     }
     return content, nil
 }
+
+func sendStatus(msg string) {
+    apiUrl := os.Getenv("WPAU_SLACK_HOOK_URL")
+    data := url.Values{}
+    data.Set("payload", "{\"username\":\"WPAU-robot\", \"icon_emoji\":\":speaking_head_in_silhouette:\", \"text\":\"" + msg + "\"}")
+
+    client := &http.Client{}
+    r, _ := http.NewRequest("POST", apiUrl, bytes.NewBufferString(data.Encode()))
+    r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+    r.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
+
+    client.Do(r)
+}
+
+
