@@ -39,12 +39,13 @@ func main() {
 
 func startJob(customer string, repo string, worker_name string, client* cloudstack.Client) {
     log.Println("Starting job..")
-    serviceOfferingMicro := "1bd74b58-ac1e-46e4-86cb-a9542064b8a4"
     userdata, err := generateUserdata(repo, worker_name, customer)
     if (err != nil) {
         log.Println("Couldn't read user data template file, stopping..")
         return
     }
+    //serviceOfferingMicro := "1bd74b58-ac1e-46e4-86cb-a9542064b8a4"
+    serviceOfferingMedium := "8c7a1b14-19d3-4f91-a59b-08064e2b5692"
     defaultZone := "806945e8-2431-4526-9d1c-70748f287439"
     //networkId := "19313259-68af-4d65-9e28-1249ee60887a"
     //defaultZone := "19313259-68af-4d65-9e28-1249ee60887a"
@@ -53,7 +54,7 @@ func startJob(customer string, repo string, worker_name string, client* cloudsta
     //ubuntuTemplate := "rbc/ubuntu-14.04-server-cloudimg-amd64-20GB-20153214"
     ubuntuTemplate := "497cacef-6492-4130-bd15-45748c0a4864" // Det är den som ligger ovan..
     //serviceOfferingMini := "84d98576-17c7-4bc4-831b-27ceec3e35bc"
-    params := cloudstack.NewDeployVirtualMachineParameter(serviceOfferingMicro, ubuntuTemplate, defaultZone)
+    params := cloudstack.NewDeployVirtualMachineParameter(serviceOfferingMedium, ubuntuTemplate, defaultZone)
     params.KeyPair.Set("ubuntu")
     params.UserData.Set(userdata)
     params.Group.Set(worker_name)
