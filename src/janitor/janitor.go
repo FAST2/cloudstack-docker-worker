@@ -64,7 +64,7 @@ func destroyInstance(id string, client* cloudstack.Client) {
 }
 
 func hasRunningContainers(ip string) (bool, error) {
-    endpoint := fmt.Sprint("tcp://", ip, ":", 4243)
+    endpoint := fmt.Sprint("tcp://", ip, ":", 2375)
     client, err := docker.NewClient(endpoint)
     if (err != nil) {
         return false, err
