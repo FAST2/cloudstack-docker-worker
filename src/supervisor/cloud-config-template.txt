@@ -1,7 +1,9 @@
 #cloud-config
 runcmd:
-  - [ sh, -xc, "curl -sSL https://get.docker.io/ubuntu/ | sh" ]
-  - [ sh, -xc, 'echo DOCKER_OPTS=\"-H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock\" >> /etc/default/docker']
+  - [ sh, -xc, "curl -sSL https://get.docker.com/ | sh" ]
+  - [ sh, -xc, 'echo DOCKER_OPTS=\"-H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock --insecure-registry __DOCKER_REPO__\" >> /etc/default/docker ']
+  - echo 192.168.200.38 webdocker >> /etc/hosts
+  - echo 192.168.200.38 webdocker.f2 >> /etc/hosts
   - restart docker
   - docker pull __DOCKER_REPO__/__WORKER_NAME__
-  - docker run __WORKER_NAME__ -e kund=__CUSTOMER__
+  - docker run -e kund=__CUSTOMER__ -e SWIFT_API_USER=__SWIFT_API_USER__ -e SWIFT_API_KEY=__SWIFT_API_KEY__ -e SWIFT_AUTH_URL=__SWIFT_AUTH_URL__ __DOCKER_REPO__/__WORKER_NAME__
