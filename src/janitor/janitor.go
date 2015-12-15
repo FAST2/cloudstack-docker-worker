@@ -41,8 +41,9 @@ func workerCleanup(client* cloudstack.Client) {
 
     for i := range res {
         if (res[i].Group.String() == WORKER_NAME) {
-            log.Printf("Found worker with id: %s, ip: %s, checking status of docker containers..\n", res[i].Id.String(), res[i].PublicIp.String())
-            hasRunningContainers, err := hasRunningContainers(res[i].PublicIp.String())
+            ipadress := res[i].Nic[0].IpAddress.String()
+            log.Printf("Found worker with id: %s, ip: %s, checking status of docker containers..\n", res[i].Id.String(), ipadress)
+            hasRunningContainers, err := hasRunningContainers(ipadress)
             if (err != nil) {
                 println(err.Error())
             } else {
