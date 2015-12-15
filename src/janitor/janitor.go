@@ -50,6 +50,7 @@ func workerCleanup(client* cloudstack.Client) {
                 if (!hasRunningContainers) {
                     log.Printf("No running containers for id: %s, destroying...\n", res[i].Id.String())
                     destroyInstance(res[i].Id.String(), client)
+                    sendStatus("Destroyed instance with id " + id + " ip " + ipadress)
                 } else {
                     log.Printf("Has some running docker containers")
                 }
@@ -77,5 +78,18 @@ func hasRunningContainers(ip string) (bool, error) {
             return len(containers) > 0, nil    
         }
     }
+}
+
+func sendStatus(msg string) {
+    apiUrl := os.Getenv("WPAU_SLACK_HOOK_URL")
+    data := url.Values{}
+    data.Set("payload", "{\"username\":\"WPAU-robot\", \"icon_emoji\":\":speaking_head_in_silhouette:\", \"text\":\"" + msg + "\"}")
+
+    client := &http.Client{}
+    r, _ := http.NewRequest("POST", apiUrl, bytes.NewBufferString(data.Encode()))
+    r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+    r.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
+
+    resp, _ := client.Do(r)
 }
 
