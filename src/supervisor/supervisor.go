@@ -39,8 +39,12 @@ func main() {
 
 func startJob(customer string, repo string, worker_name string, client* cloudstack.Client) {
     log.Println("Starting job..")
-    userdata, _ := generateUserdata(repo, worker_name, customer)
     serviceOfferingMicro := "1bd74b58-ac1e-46e4-86cb-a9542064b8a4"
+    userdata, err := generateUserdata(repo, worker_name, customer)
+    if (err != nil) {
+        log.Println("Couldn't read user data template file, stopping..")
+        return
+    }
     defaultZone := "806945e8-2431-4526-9d1c-70748f287439"
     //networkId := "19313259-68af-4d65-9e28-1249ee60887a"
     //defaultZone := "19313259-68af-4d65-9e28-1249ee60887a"
