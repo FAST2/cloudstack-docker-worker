@@ -129,7 +129,7 @@ func uploadContentsInFolder(path string, prefix string, container string, c swif
 
     err := filepath.Walk(path, func(subpath string, f os.FileInfo, err error) error {
         if (!f.IsDir()) {
-            uploadFile(container, prefix, path, c)
+            uploadFile(container, prefix, subpath, c)
         }
         return nil
     })
