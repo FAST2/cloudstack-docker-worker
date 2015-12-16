@@ -127,10 +127,8 @@ func getContentFromContainer(container string, c swift.Connection) {
 func uploadContentsInFolder(path string, prefix string, container string, c swift.Connection) {
     createContainer(container, c)
 
-    err := filepath.Walk(path, func(path string, f os.FileInfo, err error) error {
-        if (f.IsDir()) {
-            uploadContentsInFolder(path, prefix, container, c)
-        } else {
+    err := filepath.Walk(path, func(subpath string, f os.FileInfo, err error) error {
+        if (!f.IsDir()) {
             uploadFile(container, prefix, path, c)
         }
         return nil
