@@ -156,7 +156,7 @@ func uploadFile(container string, prefix string, path string, c swift.Connection
         hasher.Write(dat)
         md5hash := hex.EncodeToString(hasher.Sum(nil))
 
-        fmt.Printf("Uploading %s to container %s", name, container)
+        fmt.Printf("Uploading %s to container %s\n", name, container)
         file, err := c.ObjectCreate(container, name, false, md5hash, ext, nil)
         if (err != nil) {
             println(err.Error())
