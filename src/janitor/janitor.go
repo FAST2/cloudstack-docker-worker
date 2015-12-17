@@ -7,10 +7,15 @@ import (
     "github.com/fsouza/go-dockerclient"
     "github.com/atsaki/golang-cloudstack-library"
     "os"
+    "net/http"
+    "bytes"
+    "strconv"
+    "time"
 )
 
 const (
     WORKER_NAME = "wpau-worker"
+    WARM_UP_MINUTES = 30
 )
 
 func main() {
@@ -43,20 +48,44 @@ func workerCleanup(client* cloudstack.Client) {
         if (res[i].Group.String() == WORKER_NAME) {
             ipadress := res[i].Nic[0].IpAddress.String()
             log.Printf("Found worker with id: %s, ip: %s, checking status of docker containers..\n", res[i].Id.String(), ipadress)
-            hasRunningContainers, err := hasRunningContainers(ipadress)
+            isWarmedUp, err := hasWarmUp(res[i].Created.String())
+
             if (err != nil) {
                 println(err.Error())
+                continue
+            }
+
+            if (!isWarmedUp) {
+                log.Printf("Container with id %s is not yet warmed up, doing nothing", res[i].Id.String())
+                continue
+            }
+
+            hasRunningContainers, err := hasRunningContainers(ipadress)
+            if (err != nil) {
+                println(err.Error()) 
+                continue
+            }
+
+            if (!hasRunningContainers) {
+                log.Printf("No running containers for id: %s, destroying...\n", res[i].Id.String())
+                //destroyInstance(res[i].Id.String(), client)
+                //sendStatus("Destroyed instance with id " + res[i].Id.String() + " ip " + ipadress)
             } else {
-                if (!hasRunningContainers) {
-                    log.Printf("No running containers for id: %s, destroying...\n", res[i].Id.String())
-                    destroyInstance(res[i].Id.String(), client)
-                    sendStatus("Destroyed instance with id " + id + " ip " + ipadress)
-                } else {
-                    log.Printf("Has some running docker containers")
-                }
+                log.Printf("Has some running docker containers, wont destroy")
             }
         }
     }
+}
+
+func hasWarmUp(datetime string) (bool, error) {
+    const layout = "2006-01-02T15:04:05Z0700"
+    t, err := time.Parse(layout, datetime)
+    if (err != nil) {
+        return false, err
+    } else {
+        return time.Now().After( t.Add(time.Duration(WARM_UP_MINUTES) * time.Minute)), nil
+    }
+
 }
 
 func destroyInstance(id string, client* cloudstack.Client) {
@@ -90,6 +119,6 @@ func sendStatus(msg string) {
     r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
     r.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
 
-    resp, _ := client.Do(r)
+    client.Do(r)
 }
 
