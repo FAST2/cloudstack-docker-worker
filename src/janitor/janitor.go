@@ -68,8 +68,8 @@ func workerCleanup(client* cloudstack.Client) {
 
             if (!hasRunningContainers) {
                 log.Printf("No running containers for id: %s, destroying...\n", res[i].Id.String())
-                //destroyInstance(res[i].Id.String(), client)
-                //sendStatus("Destroyed instance with id " + res[i].Id.String() + " ip " + ipadress)
+                destroyInstance(res[i].Id.String(), client)
+                sendStatus("Destroyed instance with id " + res[i].Id.String() + " ip " + ipadress)
             } else {
                 log.Printf("Has some running docker containers, wont destroy")
             }
