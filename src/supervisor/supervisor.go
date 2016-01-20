@@ -55,11 +55,13 @@ func startJob(customer string, repo string, worker_name string, client* cloudsta
     params.UserData.Set(userdata)
     params.Group.Set(worker_name)
 
-    _, err = client.DeployVirtualMachine(params)
+    res, err := client.DeployVirtualMachine(params)
     if (err != nil) {
         log.Printf("Couldn't create/deploy new instance, error from API: %s", err.Error())
     } else {
-        sendStatus("Created new instance in da cloud for customer " + customer)
+        id := res.Id.String()
+        ipadress := res.Nic[0].IpAddress.String()
+        sendStatus("Created new instance in da cloud for customer " + customer + " id: " + id + " IP-adress: " + ipadress)
         
     }
 }
