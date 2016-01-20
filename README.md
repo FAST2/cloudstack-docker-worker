@@ -8,10 +8,15 @@
 
 # Variables (used for supervisor and janitor)
 export SWIFT_API_USER="username"
+
 export SWIFT_API_KEY="apikey"
+
 export SWIFT_AUTH_URL="authurl"
+
 export RBC_API_KEY="apikey"
+
 export RBC_SECRET="secret"
+
 export WPAU_SLACK_HOOK_URL="slack-url-if-desired"
 
 
