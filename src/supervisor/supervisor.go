@@ -86,6 +86,7 @@ func generateUserdata(repo string, worker_name string, customer string) (string,
         content = strings.Replace(content, "__SWIFT_API_USER__", os.Getenv("SWIFT_API_USER"), -1)
         content = strings.Replace(content, "__SWIFT_API_KEY__", os.Getenv("SWIFT_API_KEY"), -1)
         content = strings.Replace(content, "__SWIFT_AUTH_URL__", os.Getenv("SWIFT_AUTH_URL"), -1)
+        content = strings.Replace(content, "__WPAU_SLACK_HOOK_URL__", os.Getenv("WPAU_SLACK_HOOK_URL"), -1)
     }
     return content, nil
 }

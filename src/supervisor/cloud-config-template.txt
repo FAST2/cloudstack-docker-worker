@@ -6,4 +6,4 @@ runcmd:
   - echo 192.168.200.38 webdocker.f2 >> /etc/hosts
   - restart docker
   - docker pull __DOCKER_REPO__/__WORKER_NAME__
-  - docker run -e kund=__CUSTOMER__ -e SWIFT_API_USER=__SWIFT_API_USER__ -e SWIFT_API_KEY=__SWIFT_API_KEY__ -e SWIFT_AUTH_URL=__SWIFT_AUTH_URL__ __DOCKER_REPO__/__WORKER_NAME__
+  - docker run -e kund=__CUSTOMER__ -e SWIFT_API_USER=__SWIFT_API_USER__ -e SWIFT_API_KEY=__SWIFT_API_KEY__ -e SWIFT_AUTH_URL=__SWIFT_AUTH_URL__ -e WPAU_SLACK_HOOK_URL=__WPAU_SLACK_HOOK_URL__ __DOCKER_REPO__/__WORKER_NAME__
