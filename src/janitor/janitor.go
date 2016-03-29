@@ -49,7 +49,6 @@ func workerCleanup(client* cloudstack.Client) {
         if (res[i].Group.String() == WORKER_NAME) {
             id := res[i].Id.String()
             ipadress := res[i].Nic[0].IpAddress.String()
-            duration_running, _ := getDurationRunning(res[i].Created.String())
             log.Printf("Found worker with id: %s, ip: %s, checking status of docker containers..\n", id, ipadress)
             isWarmedUp, err := hasWarmUp(res[i].Created.String())
 
@@ -75,9 +74,6 @@ func workerCleanup(client* cloudstack.Client) {
                 sendStatus("Destroyed instance with id " + id + " ip " + ipadress)
             } else {
                 log.Printf("Has some running docker containers, wont destroy")
-                if (duration_running.Hours() > WARNING_NO_HOURS) {
-                    sendStatus("Instance with id " + id + " ip " + ipadress + " has been running over 6 hours, normal?")
-                }
             }
         }
     }
@@ -91,16 +87,6 @@ func hasWarmUp(datetime string) (bool, error) {
     } else {
         return time.Now().After( t.Add(time.Duration(WARM_UP_MINUTES) * time.Minute)), nil
     }
-}
-
-func getDurationRunning(datetime string) (time.Duration, error) {
-    const layout = "2006-01-02T15:04:05Z0700"
-    t, err := time.Parse(layout, datetime)
-    if (err != nil) {
-        return time.Second, err
-    } else {
-        return time.Since(t), nil
-    }    
 }
 
 func destroyInstance(id string, client* cloudstack.Client) {
