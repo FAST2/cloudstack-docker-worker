@@ -15,7 +15,7 @@ import (
 
 const (
     WORKER_NAME = "wpau-worker"
-    WARM_UP_MINUTES = 30
+    WARM_UP_MINUTES = 15
     WARNING_NO_HOURS = 6
 )
 
