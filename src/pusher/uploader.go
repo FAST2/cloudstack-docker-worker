@@ -10,6 +10,7 @@ import (
     "path/filepath"
     "bytes"
     "encoding/json"
+    "fast2.se/swifthelper"
     //"strings"
 )
 
@@ -125,11 +126,11 @@ func getContentFromContainer(container string, c swift.Connection) {
 
 
 func uploadContentsInFolder(path string, prefix string, container string, c swift.Connection) {
-    createContainer(container, c)
+    swifthelper.CreatePublicContainer(container, c)
 
     err := filepath.Walk(path, func(subpath string, f os.FileInfo, err error) error {
         if (!f.IsDir()) {
-            uploadFile(container, prefix, subpath, c)
+            swifthelper.UploadFile(container, prefix, subpath, c)
         }
         return nil
     })
@@ -138,31 +139,3 @@ func uploadContentsInFolder(path string, prefix string, container string, c swif
     }
 }
 
-func createContainer(name string, c swift.Connection) {
-    headers := map[string]string{
-        "X-Container-Read": ".r:*",
-    }
-    c.ContainerCreate(name, headers)
-}
-
-func uploadFile(container string, prefix string, path string, c swift.Connection) {
-    dat, err := ioutil.ReadFile(path)
-    if (err != nil) {
-        println(err.Error())
-    } else {
-        name := prefix + "-" + filepath.Base(path)
-        ext := filepath.Ext(path)
-        hasher := md5.New()
-        hasher.Write(dat)
-        md5hash := hex.EncodeToString(hasher.Sum(nil))
-
-        fmt.Printf("Uploading %s to container %s\n", name, container)
-        file, err := c.ObjectCreate(container, name, false, md5hash, ext, nil)
-        if (err != nil) {
-            println(err.Error())
-        } else {
-            file.Write(dat)
-        }
-        file.Close()
-    }
-}
