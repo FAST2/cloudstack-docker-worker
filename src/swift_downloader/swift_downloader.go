@@ -4,7 +4,7 @@ import (
     "github.com/ncw/swift"
     "fmt"
     "os"
-    "fast2.se/swifthelper"
+    "swifthelper"
 )
 
 func main() {
