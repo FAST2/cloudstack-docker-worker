@@ -68,6 +68,8 @@ func downloadFiles(container string, files []string, c swift.Connection) {
         _, err = c.ObjectGet(container, name, f, true, nil)
         if (err != nil) {
             println("Couldn't download file: " + name)
+        } else {
+            println("Downloaded file: " + name)
         }
     }
 }
