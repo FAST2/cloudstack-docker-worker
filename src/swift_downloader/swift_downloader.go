@@ -4,7 +4,7 @@ import (
     "github.com/ncw/swift"
     "fmt"
     "os"
-    "swifthelper"
+    "github.com/fast2/wpauswiftcommons"
 )
 
 func main() {
@@ -44,7 +44,7 @@ func main() {
 }
 
 func downloadFiles(container string, files []string, c swift.Connection) {
-    swifthelper.CreatePublicContainer(container, c)
+    wpauswiftcommons.CreatePublicContainer(container, c)
     names, err := c.ObjectNames(container, nil)
 
     if (err != nil) {

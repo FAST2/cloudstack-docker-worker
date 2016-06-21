@@ -10,7 +10,7 @@ import (
     //"path/filepath"
     //"bytes"
     //"encoding/json"
-    "swifthelper"
+    "github.com/fast2/wpauswiftcommons"
 )
 
 func main() {
@@ -50,9 +50,9 @@ func main() {
 }
 
 func uploadFiles(container string, files []string, c swift.Connection) {
-    swifthelper.CreatePublicContainer(container, c)
+    wpauswiftcommons.CreatePublicContainer(container, c)
 
     for _, e := range files {
-        swifthelper.UploadFile(container, "", e, c)
+        wpauswiftcommons.UploadFile(container, "", e, c)
     }
 }

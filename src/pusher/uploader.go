@@ -5,7 +5,7 @@ import (
     "fmt"
     "os"
     "path/filepath"
-    "fast2.se/swifthelper"
+    "github.com/fast2/wpauswiftcommons"
     "github.com/fast2/wpaumetadata"
 )
 
@@ -47,11 +47,11 @@ func main() {
 }
 
 func uploadContentsInFolder(path string, prefix string, container string, c swift.Connection) {
-    swifthelper.CreatePublicContainer(container, c)
+    wpauswiftcommons.CreatePublicContainer(container, c)
 
     err := filepath.Walk(path, func(subpath string, f os.FileInfo, err error) error {
         if (!f.IsDir()) {
-            swifthelper.UploadFile(container, prefix, subpath, c)
+            wpauswiftcommons.UploadFile(container, prefix, subpath, c)
         }
         return nil
     })
