@@ -40,7 +40,7 @@ func main() {
 
 func get_projects(c swift.Connection) []string {
     opts := new(swift.ContainersOpts)
-    //opts.Prefix = "jobs"
+    opts.Prefix = "jobs"
 
     containers, err := c.ContainerNames(opts)
     if (err != nil) {
