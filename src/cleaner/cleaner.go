@@ -22,8 +22,6 @@ func main() {
 
     println("Starting cleaner")
 
-    println(os.Getenv("SWIFT_API_USER"))
-
     // Authenticate
     err := c.Authenticate()
     if err != nil {
