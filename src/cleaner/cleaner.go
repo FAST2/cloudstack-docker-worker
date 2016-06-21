@@ -8,7 +8,7 @@ import (
     "encoding/json"
 )
 
-const MAX_JOBS = 109
+const MAX_JOBS = 108
 
 func main() {
     // Create a connection
@@ -73,14 +73,11 @@ func clean_old_jobs(c swift.Connection, container string) {
             prefix := infos.Infos[i].JobId
             fmt.Printf("Will iterate over contents of %s with prefix %s for removal of items\n", container, prefix)
             objects_to_remove := get_objects(c, container, prefix)
-            fmt.Printf("Removing %s\n", objects_to_remove)
-            //remove_objects(c, container, objects_to_remove)
+            fmt.Printf("Items to be removed: %s\n", objects_to_remove)
+            remove_objects(c, container, objects_to_remove)
             infos = remove_from_metadata(infos, prefix)
         }
     }
-
-    if (false) {
-
     
     updated_metadata, err := json.Marshal(infos)
     if (err != nil) {
@@ -88,7 +85,6 @@ func clean_old_jobs(c swift.Connection, container string) {
     } else {
         wpaumetadata.Upload(c, container, updated_metadata)
     }
-}
 
 }
 
@@ -103,11 +99,16 @@ func get_objects(c swift.Connection, container string, prefix string) []string {
 }
 
 func remove_objects(c swift.Connection, container string, names []string) bool {
-    res, err := c.BulkDelete(container, names)
-    if (err != nil) {
-        return res.NumberDeleted == int64(len(names))
+    removed_all := true
+    for _, val := range names {
+        fmt.Printf("Removing %s\n", val)
+        err := c.ObjectDelete(container, val)
+        if (err != nil) {
+            fmt.Printf("Couldn't delete '%s' because: %s\n", val, err.Error())
+            removed_all = false
+        }
     }
-    return false
+    return removed_all
 }
 
 func remove_from_metadata(infos wpaumetadata.Jobinfos, id_to_remove string) wpaumetadata.Jobinfos {
