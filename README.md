@@ -2,6 +2,8 @@
 Small util scripts used for managing an cloudstack infrastructure as a worker pool.
 
 ## Schedelued components
+These components should be run with crontab or other schedeluer.
+
 - *supervisor* is the guy who starts new instanses, it will start an new instance and upload a cloud-configuration file which installs docker and runs the desired image.
 - *janitor* is the cleaner. He will periodically (well, a cronjob needs to be created) destroy instanses within the group that is not running any docker containers. A warmup period of 30 minutes is used to not destroy instanses before they get the chance to start docker.
 - *cleaner* Cleans old jobs and files associated once the CLEAN_OLD_JOBS days has passed.
@@ -21,6 +23,3 @@ export RBC_API_KEY="apikey"
 export RBC_SECRET="secret"
 export WPAU_SLACK_HOOK_URL="slack-url-if-desired"
 ```
-
-# Cronjob
-Use with cronjob, supervisor once a day and janitor every 20 min
