@@ -19,6 +19,8 @@ These components should be run with crontab or other schedeluer.
 export SWIFT_API_USER="username"
 export SWIFT_API_KEY="apikey"
 export SWIFT_AUTH_URL="authurl"
+export SWIFT_DOMAIN="domain"
+export SWIFT_TENANT=tenant"
 export RBC_API_KEY="apikey"
 export RBC_SECRET="secret"
 export WPAU_SLACK_HOOK_URL="slack-url-if-desired"
