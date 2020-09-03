@@ -14,7 +14,7 @@ func main() {
 		UserName: os.Getenv("SWIFT_API_USER"),
 		ApiKey:   os.Getenv("SWIFT_API_KEY"),
 		AuthUrl:  os.Getenv("SWIFT_AUTH_URL"),
-		Domain:   os.Getenv("SWIFT_DOMAIN"), // Name of the domain (v3 auth only)
+		Domain:   os.Getenv("SWIFT_API_DOMAIN"), // Name of the domain (v3 auth only)
 		Tenant:   os.Getenv("SWIFT_TENANT"), // Name of the tenant (v2 auth only)
 	}
 
