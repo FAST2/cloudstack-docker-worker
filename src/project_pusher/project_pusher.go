@@ -21,11 +21,11 @@ func main() {
 	}
 
 	if len(os.Args) < 3 {
-		fmt.Printf("Usage: %s project files...\n", os.Args[0])
+		fmt.Printf("Usage: %s [project] [files]...\n", os.Args[0])
 		os.Exit(1)
 	}
 
-	println("Starting objekt storage uploader")
+	fmt.Println("Starting objekt storage uploader")
 
 	var (
 		project = os.Args[1]
@@ -36,7 +36,8 @@ func main() {
 	// Authenticate
 	err := c.Authenticate(ctx)
 	if err != nil {
-		panic(err)
+		fmt.Printf("Error authenticating: %s\n", err)
+		os.Exit(1)
 	}
 
 	files := os.Args[2:]
