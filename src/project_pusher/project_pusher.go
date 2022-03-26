@@ -1,27 +1,23 @@
 package main
 
 import (
+	"context"
 	"fmt"
-
-	"github.com/ncw/swift"
-	//"crypto/md5"
-	//"io/ioutil"
-	//"encoding/hex"
 	"os"
-	//"path/filepath"
-	//"bytes"
-	//"encoding/json"
-	"github.com/fast2/wpauswiftcommons"
+
+	swift "github.com/ncw/swift/v2"
+	"github.com/oquinena/wpauswiftcommons"
 )
 
 func main() {
+	ctx := context.Background()
 	// Create a connection
-	c := swift.Connection{
+	c := &swift.Connection{
 		UserName: os.Getenv("SWIFT_API_USER"),
 		ApiKey:   os.Getenv("SWIFT_API_KEY"),
 		AuthUrl:  os.Getenv("SWIFT_AUTH_URL"),
 		Domain:   os.Getenv("SWIFT_API_DOMAIN"), // Name of the domain (v3 auth only)
-		Tenant:   os.Getenv("SWIFT_TENANT"), // Name of the tenant (v2 auth only)
+		Tenant:   os.Getenv("SWIFT_TENANT"),     // Name of the tenant (v2 auth only)
 	}
 
 	if len(os.Args) < 3 {
@@ -38,21 +34,21 @@ func main() {
 	container_name := "project-" + project
 
 	// Authenticate
-	err := c.Authenticate()
+	err := c.Authenticate(ctx)
 	if err != nil {
 		panic(err)
 	}
 
 	files := os.Args[2:]
 
-	uploadFiles(container_name, files, c)
+	uploadFiles(ctx, container_name, files, *c)
 
 }
 
-func uploadFiles(container string, files []string, c swift.Connection) {
-	wpauswiftcommons.CreatePublicContainer(container, c)
+func uploadFiles(ctx context.Context, container string, files []string, c swift.Connection) {
+	wpauswiftcommons.CreatePublicContainer(ctx, container, c)
 
 	for _, e := range files {
-		wpauswiftcommons.UploadFile(container, "", e, c)
+		wpauswiftcommons.UploadFile(ctx, container, "", e, c)
 	}
 }
