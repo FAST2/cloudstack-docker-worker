@@ -1,21 +1,21 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 
-	"github.com/fast2/wpauswiftcommons"
-	"github.com/ncw/swift"
+	"github.com/FAST2/wpauswiftcommons"
+	"github.com/ncw/swift/v2"
 )
 
 func main() {
-	// Create a connection
-	c := swift.Connection{
-		UserName: os.Getenv("SWIFT_API_USER"),
-		ApiKey:   os.Getenv("SWIFT_API_KEY"),
-		AuthUrl:  os.Getenv("SWIFT_AUTH_URL"),
-		Domain:   os.Getenv("SWIFT_API_DOMAIN"), // Name of the domain (v3 auth only)
-		Tenant:   os.Getenv("SWIFT_TENANT"), // Name of the tenant (v2 auth only)
+	ctx := context.Background()
+	// Create a connection using openstack v3applicationcredential
+	c := &swift.Connection{
+		ApplicationCredentialId:     os.Getenv("OS_APPLICATION_CREDENTIAL_ID"),
+		ApplicationCredentialSecret: os.Getenv("OS_APPLICATION_CREDENTIAL_SECRET"),
+		AuthUrl:                     os.Getenv("OS_AUTH_URL"),
 	}
 
 	if len(os.Args) < 3 {
@@ -23,7 +23,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	println("Starting objekt storage downloader")
+	println("Starting objekt storage downloader...")
 
 	var (
 		project = os.Args[1]
@@ -32,20 +32,21 @@ func main() {
 	container_name := "project-" + project
 
 	// Authenticate
-	err := c.Authenticate()
+	err := c.Authenticate(ctx)
 	if err != nil {
-		panic(err)
+		fmt.Printf("Error authenticating: %s\n", err)
+		os.Exit(1)
 	}
 
 	files := os.Args[2:]
 
-	downloadFiles(container_name, files, c)
+	downloadFiles(ctx, container_name, files, *c)
 
 }
 
-func downloadFiles(container string, files []string, c swift.Connection) {
-	wpauswiftcommons.CreatePublicContainer(container, c)
-	names, err := c.ObjectNames(container, nil)
+func downloadFiles(ctx context.Context, container string, files []string, c swift.Connection) {
+	wpauswiftcommons.CreatePublicContainer(ctx, container, c)
+	names, err := c.ObjectNames(ctx, container, nil)
 
 	if err != nil {
 		println(err.Error())
@@ -65,7 +66,7 @@ func downloadFiles(container string, files []string, c swift.Connection) {
 		}
 		defer f.Close()
 
-		_, err = c.ObjectGet(container, name, f, true, nil)
+		_, err = c.ObjectGet(ctx, container, name, f, true, nil)
 		if err != nil {
 			println("Couldn't download file: " + name)
 		} else {

@@ -1,31 +1,31 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
 
-	"github.com/fast2/wpaumetadata"
-	"github.com/fast2/wpauswiftcommons"
-	"github.com/ncw/swift"
+	"github.com/FAST2/wpaumetadata"
+	"github.com/FAST2/wpauswiftcommons"
+	"github.com/ncw/swift/v2"
 )
 
 func main() {
-	// Create a connection
-	c := swift.Connection{
-		UserName: os.Getenv("SWIFT_API_USER"),
-		ApiKey:   os.Getenv("SWIFT_API_KEY"),
-		AuthUrl:  os.Getenv("SWIFT_AUTH_URL"),
-		Domain:   os.Getenv("SWIFT_API_DOMAIN"), // Name of the domain (v3 auth only)
-		Tenant:   os.Getenv("SWIFT_TENANT"), // Name of the tenant (v2 auth only)
+	ctx := context.Background()
+	// Create a connection using openstack v3applicationcredential
+	c := &swift.Connection{
+		ApplicationCredentialId:     os.Getenv("OS_APPLICATION_CREDENTIAL_ID"),
+		ApplicationCredentialSecret: os.Getenv("OS_APPLICATION_CREDENTIAL_SECRET"),
+		AuthUrl:                     os.Getenv("OS_AUTH_URL"),
 	}
 
 	if len(os.Args) < 5 {
-		fmt.Printf("Usage: %s customer jobId status path\n", os.Args[0])
+		fmt.Printf("Usage: %s [customer] [jobId] [status] [path]\n", os.Args[0])
 		os.Exit(1)
 	}
 
-	println("Starting objekt storage uploader")
+	println("Starting object storage uploader...")
 
 	var (
 		customer = os.Args[1]
@@ -38,21 +38,22 @@ func main() {
 	file_prefix := jobId
 
 	// Authenticate
-	err := c.Authenticate()
+	err := c.Authenticate(ctx)
 	if err != nil {
-		panic(err)
+		fmt.Printf("Error authenticating: %s\n", err)
+		os.Exit(1)
 	}
 
-	uploadContentsInFolder(path, file_prefix, container_name, c)
-	wpaumetadata.Add(c, container_name, jobId, status)
+	uploadContentsInFolder(ctx, path, file_prefix, container_name, *c)
+	wpaumetadata.Add(ctx, *c, container_name, jobId, status)
 }
 
-func uploadContentsInFolder(path string, prefix string, container string, c swift.Connection) {
-	wpauswiftcommons.CreatePublicContainer(container, c)
+func uploadContentsInFolder(ctx context.Context, path string, prefix string, container string, c swift.Connection) {
+	wpauswiftcommons.CreatePublicContainer(ctx, container, c)
 
 	err := filepath.Walk(path, func(subpath string, f os.FileInfo, err error) error {
 		if !f.IsDir() {
-			wpauswiftcommons.UploadFile(container, prefix, subpath, c)
+			wpauswiftcommons.UploadFile(ctx, container, prefix, subpath, c)
 		}
 		return nil
 	})

@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/fast2/wpauswiftcommons"
 	swift "github.com/ncw/swift/v2"
-	"github.com/oquinena/wpauswiftcommons"
 )
 
 func main() {
