@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/FAST2/wpaumetadata"
 	"github.com/FAST2/wpauswiftcommons"
@@ -18,6 +19,7 @@ func main() {
 		ApplicationCredentialId:     os.Getenv("OS_APPLICATION_CREDENTIAL_ID"),
 		ApplicationCredentialSecret: os.Getenv("OS_APPLICATION_CREDENTIAL_SECRET"),
 		AuthUrl:                     os.Getenv("OS_AUTH_URL"),
+		ConnectTimeout:              time.Duration(time.Second * 60),
 	}
 
 	if len(os.Args) < 5 {
