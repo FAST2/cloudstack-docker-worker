@@ -4,8 +4,9 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"time"
 
-	"github.com/fast2/wpauswiftcommons"
+	"github.com/FAST2/wpauswiftcommons"
 	swift "github.com/ncw/swift/v2"
 )
 
@@ -16,6 +17,7 @@ func main() {
 		ApplicationCredentialId:     os.Getenv("OS_APPLICATION_CREDENTIAL_ID"),
 		ApplicationCredentialSecret: os.Getenv("OS_APPLICATION_CREDENTIAL_SECRET"),
 		AuthUrl:                     os.Getenv("OS_AUTH_URL"),
+		ConnectTimeout:              time.Duration(time.Second * 60),
 	}
 
 	// We need at least two arguments. Project to upload to and file(s) to upload
